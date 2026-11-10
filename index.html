@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💰 Aplikasi Nabung</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+  
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: slideUp 0.5s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .header h1 { font-size: 22px; margin-bottom: 6px; }
+  .header p { font-size: 13px; opacity: 0.85; }
+
+  .content { padding: 24px; }
+
+  /* ===== SALDO CARDS ===== */
+  .saldo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .saldo-mini {
+    padding: 16px;
+    border-radius: 16px;
+    color: white;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .saldo-mini.pribadi {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .saldo-mini.cewe {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .saldo-mini-label {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .saldo-mini-amount {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .saldo-total {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    padding: 18px 20px;
+    border-radius: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(17,153,142,0.35);
+  }
+
+  .saldo-total-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.95;
+  }
+
+  .saldo-total-amount {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* ===== REKENING PICKER (pill) ===== */
+  .rek-picker {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .rek-option {
+    flex: 1;
+    padding: 12px 10px;
+    border: 2px solid #eef0f5;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .rek-option.active.pribadi {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+  }
+
+  .rek-option.active.cewe {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(245,87,108,0.4);
+  }
+
+  /* ===== TARGET SECTION ===== */
+  .target-section {
+    background: #f8f9fc;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .target-header {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .target-header-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .target-header-badge.cewe {
+    background: #f5576c;
+  }
+
+  .target-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    background: #eef0f5;
+    padding: 4px;
+    border-radius: 10px;
+  }
+
+  .target-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .target-tab.active {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .target-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .target-input-row input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid #eef0f5;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background: white;
+  }
+
+  .target-input-row input:focus { border-color: #667eea; }
+
+  .btn-set {
+    padding: 12px 18px;
+    border: none;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-set:active { transform: scale(0.97); }
+
+  .period-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .progress-bar {
+    height: 12px;
+    background: #eef0f5;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.6s ease;
+  }
+
+  .progress-fill.cewe {
+    background: linear-gradient(90deg, #f093fb, #f5576c);
+  }
+
+  .period-detail {
+    font-size: 11px;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ===== INPUT SECTION ===== */
+  .input-group { margin-bottom: 14px; }
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #eef0f5;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .input-group input:focus { border-color: #667eea; }
+
+  .nominal-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .nominal-prefix {
+    position: absolute;
+    left: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #667eea;
+    pointer-events: none;
+  }
+
+  .nominal-wrapper input {
+    padding-left: 44px;
+    font-weight: 600;
+  }
+
+  .nominal-hint {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .nominal-preview {
+    background: #f0f4ff;
+    color: #667eea;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+  .btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-add { background: linear-gradient(135deg, #11998e, #38ef7d); }
+  .btn-withdraw { background: linear-gradient(135deg, #eb3349, #f45c43); }
+  .btn:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+
+  /* ===== RIWAYAT ===== */
+  .riwayat-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn-clear {
+    background: #f0f0f5;
+    color: #666;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .btn-clear:hover { background: #e0e0e8; }
+
+  .riwayat-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    background: #f8f9fc;
+    padding: 4px;
+    border-radius: 10px;
+  }
+
+  .riwayat-tab {
+    flex: 1;
+    padding: 9px 6px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .riwayat-tab.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+  }
+
+  /* filter rekening di riwayat */
+  .rek-filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .rek-filter-tab {
+    flex: 1;
+    padding: 8px 6px;
+    border: 1.5px solid #eef0f5;
+    background: white;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .rek-filter-tab.active {
+    border-color: #667eea;
+    color: #667eea;
+    background: #f0f4ff;
+  }
+
+  .rek-filter-tab.active.all {
+    border-color: #333;
+    color: white;
+    background: #333;
+  }
+
+  /* ===== KALENDER ===== */
+  .cal-wrap {
+    background: #f8f9fc;
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .cal-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 6px;
+  }
+
+  .cal-nav-btn {
+    background: white;
+    border: 1px solid #eef0f5;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #667eea;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cal-nav-btn:active { transform: scale(0.93); }
+
+  .cal-month-picker {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .cal-month-picker select {
+    padding: 6px 8px;
+    border: 1px solid #eef0f5;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    background: white;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .cal-month-picker select:focus { border-color: #667eea; }
+
+  .cal-week-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+    padding: 4px;
+    background: white;
+    border-radius: 6px;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .cal-day-name {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #999;
+    padding: 4px 0;
+    text-transform: uppercase;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #eef0f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s;
+    padding: 2px;
+    min-height: 40px;
+  }
+
+  .cal-day:hover { border-color: #667eea; }
+
+  .cal-day.today {
+    border: 2px solid #667eea;
+    background: #f0f4ff;
+    color: #667eea;
+    font-weight: 700;
+  }
+
+  .cal-day.has-trx { background: #f8f9fc; }
+
+  .cal-day.selected {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+    border-color: #667eea !important;
+    box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+    transform: scale(1.05);
+  }
+
+  .cal-dots {
+    display: flex;
+    gap: 2px;
+    margin-top: 2px;
+  }
+
+  .cal-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  .cal-dot.masuk { background: #11998e; }
+  .cal-dot.keluar { background: #eb3349; }
+  .cal-day.selected .cal-dot { background: white; }
+
+  /* WEEK SUMMARY */
+  .week-summary {
+    background: white;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    border: 1px solid #eef0f5;
+  }
+  .week-summary-label { color: #888; font-weight: 600; }
+  .week-summary-val { font-weight: 700; }
+  .week-summary-val.pos { color: #11998e; }
+  .week-summary-val.neg { color: #eb3349; }
+  .week-summary-val.zero { color: #888; }
+
+  /* DAY DETAIL */
+  .day-detail {
+    margin-top: 12px;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #eef0f5;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .day-detail-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #eef0f5;
+  }
+
+  .riwayat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fc;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    animation: fadeIn 0.3s ease;
+  }
+  .riwayat-item:last-child { margin-bottom: 0; }
+
+  .riwayat-info { display: flex; flex-direction: column; gap: 2px; }
+  .riwayat-tanggal { font-size: 10px; color: #999; }
+  .riwayat-jumlah { font-size: 14px; font-weight: 700; }
+  .masuk { color: #11998e; }
+  .keluar { color: #eb3349; }
+
+  .trx-badge {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-left: 6px;
+    text-transform: uppercase;
+  }
+  .trx-badge.pribadi { background: #e0e8ff; color: #667eea; }
+  .trx-badge.cewe { background: #ffe0e8; color: #f5576c; }
+
+  .btn-hapus-item {
+    background: #ffe5e5;
+    color: #eb3349;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .btn-hapus-item:active { transform: scale(0.9); }
+
+  .empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #aaa;
+    font-size: 13px;
+  }
+
+  /* LIST VIEW */
+  .riwayat-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .riwayat-list::-webkit-scrollbar { width: 6px; }
+  .riwayat-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+  .group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+    border-radius: 10px;
+    margin: 12px 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #667eea;
+    border-left: 3px solid #667eea;
+  }
+  .group-header:first-child { margin-top: 0; }
+  .group-title { display: flex; flex-direction: column; gap: 2px; }
+  .group-name { font-size: 13px; color: #333; }
+  .group-range { font-size: 10px; color: #888; font-weight: 500; }
+  .group-total { font-size: 12px; padding: 4px 8px; border-radius: 6px; background: white; }
+  .group-total.pos { color: #11998e; }
+  .group-total.neg { color: #eb3349; }
+  .group-total.zero { color: #888; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: #11998e; }
+  .toast.error { background: #eb3349; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>💰 Aplikasi Nabung</h1>
+    <p>Kelola tabungan pribadi & cewe</p>
+  </div>
+
+  <div class="content">
+    <!-- ===== 3 SALDO ===== -->
+    <div class="saldo-grid">
+      <div class="saldo-mini pribadi">
+        <div class="saldo-mini-label">👤 Pribadi</div>
+        <div class="saldo-mini-amount" id="saldoPribadi">Rp 0</div>
+      </div>
+      <div class="saldo-mini cewe">
+        <div class="saldo-mini-label">💕 Cewe</div>
+        <div class="saldo-mini-amount" id="saldoCewe">Rp 0</div>
+      </div>
+    </div>
+
+    <div class="saldo-total">
+      <div class="saldo-total-label">💰 Total Semua Saldo</div>
+      <div class="saldo-total-amount" id="saldoTotal">Rp 0</div>
+    </div>
+
+    <!-- ===== TARGET SECTION (per rekening) ===== -->
+    <div class="target-section">
+      <div class="target-header">
+        🎯 Target
+        <span class="target-header-badge" id="targetBadge">Pribadi</span>
+      </div>
+      <div class="target-tabs">
+        <button class="target-tab active" data-mode="bulanan" onclick="switchTargetMode('bulanan')">📅 Bulanan</button>
+        <button class="target-tab" data-mode="tahunan" onclick="switchTargetMode('tahunan')">📆 Tahunan</button>
+      </div>
+      <div class="target-input-row">
+        <input type="number" id="inputTarget" placeholder="Target (dalam ribuan)" min="0">
+        <button class="btn-set" onclick="setTarget()">Set</button>
+      </div>
+      <div class="period-info">
+        <span id="periodLabel">Progress Bulan Ini</span>
+        <span id="persen">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="period-detail">
+        <span id="terkumpulInfo">Terkumpul: Rp 0</span>
+        <span id="targetInfo">Target: Rp 0</span>
+      </div>
+    </div>
+
+    <!-- ===== PILIH REKENING (untuk transaksi) ===== -->
+    <div class="input-group">
+      <label>🏦 Pilih Rekening</label>
+      <div class="rek-picker">
+        <button class="rek-option active pribadi" data-rek="pribadi" onclick="pickRekening('pribadi')">👤 Pribadi</button>
+        <button class="rek-option cewe" data-rek="cewe" onclick="pickRekening('cewe')">💕 Cewe</button>
+      </div>
+    </div>
+
+    <!-- ===== INPUT TRANSAKSI ===== -->
+    <div class="input-group">
+      <label>📅 Tanggal Transaksi</label>
+      <input type="date" id="inputTanggal">
+    </div>
+
+    <div class="input-group">
+      <label>💵 Nominal (dalam ribuan)</label>
+      <div class="nominal-wrapper">
+        <span class="nominal-prefix">Rp</span>
+        <input type="number" id="inputNominal" placeholder="50 = 50.000" min="0" oninput="updatePreview()">
+      </div>
+      <div class="nominal-hint">💡 Ketik 50 → otomatis jadi Rp 50.000</div>
+      <div class="nominal-preview" id="nominalPreview" style="display:none;">Rp 0</div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-add" onclick="nabung()">+ Nabung</button>
+      <button class="btn btn-withdraw" onclick="tarik()">− Tarik</button>
+    </div>
+
+    <!-- ===== RIWAYAT ===== -->
+    <div class="riwayat-title">
+      <span>📋 Riwayat Transaksi</span>
+      <button class="btn-clear" onclick="hapusRiwayat()">Hapus Semua</button>
+    </div>
+
+    <!-- filter rekening di riwayat -->
+    <div class="rek-filter-tabs">
+      <button class="rek-filter-tab active all" data-filter="semua" onclick="switchRekFilter('semua')">📋 Semua</button>
+      <button class="rek-filter-tab" data-filter="pribadi" onclick="switchRekFilter('pribadi')">👤 Pribadi</button>
+      <button class="rek-filter-tab" data-filter="cewe" onclick="switchRekFilter('cewe')">💕 Cewe</button>
+    </div>
+
+    <div class="riwayat-tabs">
+      <button class="riwayat-tab active" data-view="kalender" onclick="switchView('kalender')">📅 Kalender</button>
+      <button class="riwayat-tab" data-view="list" onclick="switchView('list')">📋 List</button>
+    </div>
+
+    <!-- KALENDER VIEW -->
+    <div id="kalenderView">
+      <div class="cal-wrap">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="navWeek(-1)">‹</button>
+          <div class="cal-month-picker">
+            <select id="selBulan" onchange="onMonthChange()"></select>
+            <select id="selTahun" onchange="onMonthChange()"></select>
+          </div>
+          <button class="cal-nav-btn" onclick="navWeek(1)">›</button>
+        </div>
+
+        <div class="cal-week-label" id="calWeekLabel">Minggu ini</div>
+
+        <div class="cal-grid" id="calGrid"></div>
+
+        <div class="week-summary">
+          <span class="week-summary-label">Total minggu ini</span>
+          <span class="week-summary-val zero" id="weekTotal">Rp 0</span>
+        </div>
+
+        <div id="dayDetailWrap"></div>
+      </div>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div id="listView" style="display:none;">
+      <div class="riwayat-list" id="riwayatList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ============ STATE ============
+  let state = {
+    saldoPribadi: 0,
+    saldoCewe: 0,
+    targetBulananPribadi: 0,
+    targetTahunanPribadi: 0,
+    targetBulananCewe: 0,
+    targetTahunanCewe: 0,
+    modeTarget: 'bulanan',
+    rekeningAktif: 'pribadi',      // untuk transaksi & target
+    rekFilterRiwayat: 'semua',     // filter riwayat: semua/pribadi/cewe
+    riwayat: [],                   // {tipe, jumlah, tanggal, rekening}
+    viewRiwayat: 'kalender',
+    calDate: null,
+    selectedDate: null
+  };
+
+  const NAMA_BULAN = ['Januari','Februari','Maret','April','Mei','Juni',
+                      'Juli','Agustus','September','Oktober','November','Desember'];
+  const NAMA_BULAN_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const HARI_SHORT = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+
+  // ============ LOAD/SAVE ============
+  function loadData() {
+    const saved = localStorage.getItem('nabungAppV5');
+    if (saved) {
+      try { state = { ...state, ...JSON.parse(saved) }; }
+      catch(e) { console.warn('Gagal load data', e); }
+    }
+  }
+
+  function saveData() {
+    localStorage.setItem('nabungAppV5', JSON.stringify(state));
+  }
+
+  // ============ UTIL ============
+  function formatRupiah(angka) {
+    const sign = angka < 0 ? '−' : '';
+    return sign + 'Rp ' + Math.abs(angka).toLocaleString('id-ID');
+  }
+
+  function toISODate(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function fromISODate(str) {
+    const [y,m,d] = str.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+
+  function isSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() &&
+           a.getMonth() === b.getMonth() &&
+           a.getDate() === b.getDate();
+  }
+
+  function trxDateStr(isoTanggal) {
+    const d = new Date(isoTanggal);
+    return toISODate(d);
+  }
+
+  // ============ PERIOD HELPERS ============
+  function getCurrentPeriod() {
+    const now = new Date();
+    if (state.modeTarget === 'bulanan') {
+      return { year: now.getFullYear(), month: now.getMonth() };
+    }
+    return { year: now.getFullYear(), month: null };
+  }
+
+  function isInPeriod(isoString) {
+    const d = new Date(isoString);
+    const period = getCurrentPeriod();
+    if (d.getFullYear() !== period.year) return false;
+    if (period.month !== null && d.getMonth() !== period.month) return false;
+    return true;
+  }
+
+  // total terkumpul untuk rekening aktif (sesuai periode target)
+  function hitungTerkumpul(rek) {
+    let total = 0;
+    state.riwayat.forEach(item => {
+      if (item.rekening === rek && isInPeriod(item.tanggal)) {
+        total += item.tipe === 'masuk' ? item.jumlah : -item.jumlah;
+      }
+    });
+    return total;
+  }
+
+  function getTargetAktif() {
+    const rek = state.rekeningAktif;
+    if (state.modeTarget === 'bulanan') {
+      return rek === 'pribadi' ? state.targetBulananPribadi : state.targetBulananCewe;
+    } else {
+      return rek === 'pribadi' ? state.targetTahunanPribadi : state.targetTahunanCewe;
+    }
+  }
+
+  function setTargetAktif(val) {
+    const rek = state.rekeningAktif;
+    if (state.modeTarget === 'bulanan') {
+      if (rek === 'pribadi') state.targetBulananPribadi = val;
+      else state.targetBulananCewe = val;
+    } else {
+      if (rek === 'pribadi') state.targetTahunanPribadi = val;
+      else state.targetTahunanCewe = val;
+    }
+  }
+
+  // ============ RENDER MAIN ============
+  function render() {
+    document.getElementById('saldoPribadi').textContent = formatRupiah(state.saldoPribadi);
+    document.getElementById('saldoCewe').textContent = formatRupiah(state.saldoCewe);
+    document.getElementById('saldoTotal').textContent = formatRupiah(state.saldoPribadi + state.saldoCewe);
+
+    // target tabs mode
+    document.querySelectorAll('.target-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.mode === state.modeTarget);
+    });
+
+    // rekening badge di target
+    const badge = document.getElementById('targetBadge');
+    badge.textContent = state.rekeningAktif === 'pribadi' ? 'Pribadi' : 'Cewe';
+    badge.className = 'target-header-badge' + (state.rekeningAktif === 'cewe' ? ' cewe' : '');
+
+    // target input
+    const targetAktif = getTargetAktif();
+    document.getElementById('inputTarget').value = targetAktif > 0 ? targetAktif / 1000 : '';
+
+    // period label
+    const now = new Date();
+    const label = state.modeTarget === 'bulanan'
+      ? 'Progress ' + NAMA_BULAN[now.getMonth()] + ' ' + now.getFullYear()
+      : 'Progress Tahun ' + now.getFullYear();
+    document.getElementById('periodLabel').textContent = label;
+
+    // progress
+    const terkumpul = hitungTerkumpul(state.rekeningAktif);
+    const persen = targetAktif > 0 ? Math.min(100, (terkumpul / targetAktif) * 100) : 0;
+    document.getElementById('persen').textContent = persen.toFixed(1) + '%';
+    const fill = document.getElementById('progressFill');
+    fill.style.width = persen + '%';
+    fill.className = 'progress-fill' + (state.rekeningAktif === 'cewe' ? ' cewe' : '');
+    document.getElementById('terkumpulInfo').textContent = 'Terkumpul: ' + formatRupiah(terkumpul);
+    document.getElementById('targetInfo').textContent = 'Target: ' + (targetAktif > 0 ? formatRupiah(targetAktif) : 'Belum diatur');
+
+    // rekening picker aktif
+    document.querySelectorAll('.rek-option').forEach(opt => {
+      opt.classList.toggle('active', opt.dataset.rek === state.rekeningAktif);
+    });
+
+    // filter rekening riwayat
+    document.querySelectorAll('.rek-filter-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.filter === state.rekFilterRiwayat);
+      tab.classList.toggle('all', tab.dataset.filter === 'semua');
+    });
+
+    // view tabs
+    document.querySelectorAll('.riwayat-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.view === state.viewRiwayat);
+    });
+
+    if (state.viewRiwayat === 'kalender') {
+      document.getElementById('kalenderView').style.display = 'block';
+      document.getElementById('listView').style.display = 'none';
+      renderKalender();
+    } else {
+      document.getElementById('kalenderView').style.display = 'none';
+      document.getElementById('listView').style.display = 'block';
+      renderList();
+    }
+  }
+
+  // ============ FILTER RIWAYAT ============
+  function getFilteredRiwayat() {
+    if (state.rekFilterRiwayat === 'semua') return state.riwayat;
+    return state.riwayat.filter(item => item.rekening === state.rekFilterRiwayat);
+  }
+
+  // ============ KALENDER ============
+  function renderKalender() {
+    if (!state.calDate) {
+      state.calDate = toISODate(new Date());
+      saveData();
+    }
+
+    const calDate = fromISODate(state.calDate);
+    const selBulan = document.getElementById('selBulan');
+    const selTahun = document.getElementById('selTahun');
+
+    if (selBulan.options.length === 0) {
+      NAMA_BULAN.forEach((nama, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = nama;
+        selBulan.appendChild(opt);
+      });
+    }
+
+    const curYear = new Date().getFullYear();
+    if (selTahun.options.length === 0) {
+      for (let y = curYear - 5; y <= curYear + 5; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        selTahun.appendChild(opt);
+      }
+    }
+
+    selBulan.value = calDate.getMonth();
+    selTahun.value = calDate.getFullYear();
+
+    const startOfWeek = getStartOfWeek(calDate);
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startOfWeek);
+      d.setDate(d.getDate() + i);
+      days.push(d);
+    }
+
+    const endOfWeek = days[6];
+    document.getElementById('calWeekLabel').textContent =
+      `Minggu ${days[0].getDate()} ${NAMA_BULAN_SHORT[days[0].getMonth()]} - ${endOfWeek.getDate()} ${NAMA_BULAN_SHORT[endOfWeek.getMonth()]} ${endOfWeek.getFullYear()}`;
+
+    const filtered = getFilteredRiwayat();
+    const grid = document.getElementById('calGrid');
+    let html = '';
+    HARI_SHORT.forEach(h => { html += `<div class="cal-day-name">${h}</div>`; });
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    days.forEach(d => {
+      const dateStr = toISODate(d);
+      const trxHariIni = filtered.filter(item => trxDateStr(item.tanggal) === dateStr);
+
+      let cls = 'cal-day';
+      if (isSameDay(d, today)) cls += ' today';
+      if (state.selectedDate === dateStr) cls += ' selected';
+
+      let dotsHtml = '';
+      if (trxHariIni.length > 0) {
+        cls += ' has-trx';
+        const adaMasuk = trxHariIni.some(t => t.tipe === 'masuk');
+        const adaKeluar = trxHariIni.some(t => t.tipe === 'keluar');
+        dotsHtml = '<div class="cal-dots">';
+        if (adaMasuk) dotsHtml += '<div class="cal-dot masuk"></div>';
+        if (adaKeluar) dotsHtml += '<div class="cal-dot keluar"></div>';
+        dotsHtml += '</div>';
+      }
+
+      html += `<div class="${cls}" onclick="selectDay('${dateStr}')">
+        <span>${d.getDate()}</span>
+        ${dotsHtml}
+      </div>`;
+    });
+
+    grid.innerHTML = html;
+
+    // total minggu
+    let weekTotal = 0;
+    filtered.forEach(item => {
+      const dStr = trxDateStr(item.tanggal);
+      if (days.some(d => toISODate(d) === dStr)) {
+        weekTotal += item.tipe === 'masuk' ? item.jumlah : -item.jumlah;
+      }
+    });
+    const weekTotalEl = document.getElementById('weekTotal');
+    weekTotalEl.textContent = (weekTotal >= 0 ? '+' : '') + formatRupiah(weekTotal);
+    weekTotalEl.className = 'week-summary-val ' + (weekTotal > 0 ? 'pos' : weekTotal < 0 ? 'neg' : 'zero');
+
+    renderDayDetail();
+  }
+
+  function renderDayDetail() {
+    const wrap = document.getElementById('dayDetailWrap');
+    if (!state.selectedDate) {
+      wrap.innerHTML = '';
+      return;
+    }
+
+    const filtered = getFilteredRiwayat();
+    const trxHariIni = filtered.filter(item => trxDateStr(item.tanggal) === state.selectedDate);
+
+    if (trxHariIni.length === 0) {
+      wrap.innerHTML = `<div class="day-detail">
+        <div class="day-detail-header">📅 ${formatTanggalLengkap(state.selectedDate)}</div>
+        <div class="empty-state" style="padding:12px;">Tidak ada transaksi</div>
+      </div>`;
+      return;
+    }
+
+    let html = `<div class="day-detail">
+      <div class="day-detail-header">📅 ${formatTanggalLengkap(state.selectedDate)}</div>`;
+
+    const sorted = [...trxHariIni].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+    sorted.forEach(item => {
+      const originalIdx = state.riwayat.indexOf(item);
+      const badgeCls = item.rekening === 'pribadi' ? 'pribadi' : 'cewe';
+      const badgeTxt = item.rekening === 'pribadi' ? 'Pribadi' : 'Cewe';
+      html += `
+        <div class="riwayat-item">
+          <div class="riwayat-info">
+            <span class="riwayat-jumlah ${item.tipe === 'masuk' ? 'masuk' : 'keluar'}">
+              ${item.tipe === 'masuk' ? '+' : '−'} ${formatRupiah(item.jumlah)}
+              <span class="trx-badge ${badgeCls}">${badgeTxt}</span>
+            </span>
+          </div>
+          <button class="btn-hapus-item" onclick="hapusItem(${originalIdx})">×</button>
+        </div>
+      `;
+    });
+    html += '</div>';
+    wrap.innerHTML = html;
+  }
+
+  function formatTanggalLengkap(dateStr) {
+    const d = fromISODate(dateStr);
+    return d.toLocaleDateString('id-ID', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  }
+
+  function selectDay(dateStr) {
+    state.selectedDate = state.selectedDate === dateStr ? null : dateStr;
+    saveData();
+    renderKalender();
+  }
+
+  function getStartOfWeek(date) {
+    const d = new Date(date);
+    d.setHours(0,0,0,0);
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  }
+
+  function navWeek(delta) {
+    const calDate = fromISODate(state.calDate);
+    calDate.setDate(calDate.getDate() + delta * 7);
+    state.calDate = toISODate(calDate);
+    state.selectedDate = null;
+    saveData();
+    renderKalender();
+  }
+
+  function onMonthChange() {
+    const m = parseInt(document.getElementById('selBulan').value);
+    const y = parseInt(document.getElementById('selTahun').value);
+    state.calDate = toISODate(new Date(y, m, 1));
+    state.selectedDate = null;
+    saveData();
+    renderKalender();
+  }
+
+  // ============ LIST VIEW ============
+  function renderList() {
+    const list = document.getElementById('riwayatList');
+    const filtered = getFilteredRiwayat();
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty-state">Belum ada transaksi</div>';
+      return;
+    }
+
+    const sorted = [...filtered].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    const groups = {};
+    sorted.forEach(item => {
+      const d = new Date(item.tanggal);
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      if (!groups[key]) groups[key] = { year: d.getFullYear(), month: d.getMonth(), items: [] };
+      groups[key].items.push(item);
+    });
+
+    const keys = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+    let html = '';
+    keys.forEach(key => {
+      const g = groups[key];
+      const total = g.items.reduce((s, i) => s + (i.tipe === 'masuk' ? i.jumlah : -i.jumlah), 0);
+      const totalCls = total > 0 ? 'pos' : total < 0 ? 'neg' : 'zero';
+      html += `
+        <div class="group-header">
+          <div class="group-title">
+            <span class="group-name">🗓️ ${NAMA_BULAN[g.month]} ${g.year}</span>
+            <span class="group-range">${g.items.length} transaksi</span>
+          </div>
+          <span class="group-total ${totalCls}">${total >= 0 ? '+' : ''}${formatRupiah(total)}</span>
+        </div>
+      `;
+      g.items.forEach(item => {
+        const originalIdx = state.riwayat.indexOf(item);
+        const d = new Date(item.tanggal);
+        const badgeCls = item.rekening === 'pribadi' ? 'pribadi' : 'cewe';
+        const badgeTxt = item.rekening === 'pribadi' ? 'Pribadi' : 'Cewe';
+        html += `
+          <div class="riwayat-item">
+            <div class="riwayat-info">
+              <span class="riwayat-jumlah ${item.tipe === 'masuk' ? 'masuk' : 'keluar'}">
+                ${item.tipe === 'masuk' ? '+' : '−'} ${formatRupiah(item.jumlah)}
+                <span class="trx-badge ${badgeCls}">${badgeTxt}</span>
+              </span>
+              <span class="riwayat-tanggal">📅 ${d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</span>
+            </div>
+            <button class="btn-hapus-item" onclick="hapusItem(${originalIdx})">×</button>
+          </div>
+        `;
+      });
+    });
+    list.innerHTML = html;
+  }
+
+  // ============ TOAST ============
+  let toastTimeout;
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast ' + type + ' show';
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // ============ SWITCHERS ============
+  function switchTargetMode(mode) {
+    state.modeTarget = mode;
+    saveData();
+    render();
+  }
+
+  function switchView(view) {
+    state.viewRiwayat = view;
+    saveData();
+    render();
+  }
+
+  function switchRekFilter(filter) {
+    state.rekFilterRiwayat = filter;
+    state.selectedDate = null;
+    saveData();
+    render();
+  }
+
+  function pickRekening(rek) {
+    state.rekeningAktif = rek;
+    saveData();
+    render();
+  }
+
+  // ============ SET TARGET ============
+  function setTarget() {
+    const val = parseFloat(document.getElementById('inputTarget').value) || 0;
+    if (val < 0) return showToast('Target tidak boleh negatif!', 'error');
+    const valFull = val * 1000;
+    setTargetAktif(valFull);
+    saveData();
+    render();
+    const rekLabel = state.rekeningAktif === 'pribadi' ? 'Pribadi' : 'Cewe';
+    showToast(valFull > 0
+      ? `Target ${state.modeTarget} ${rekLabel}: ${formatRupiah(valFull)} 🎯`
+      : 'Target dihapus');
+  }
+
+  function updatePreview() {
+    const val = parseFloat(document.getElementById('inputNominal').value) || 0;
+    const preview = document.getElementById('nominalPreview');
+    if (val > 0) {
+      preview.style.display = 'block';
+      preview.textContent = '= ' + formatRupiah(val * 1000);
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  function setDefaultTanggal() {
+    const input = document.getElementById('inputTanggal');
+    if (!input.value) input.value = toISODate(new Date());
+  }
+
+  // ============ NABUNG ============
+  function nabung() {
+    const nominalInput = parseFloat(document.getElementById('inputNominal').value);
+    const tanggalInput = document.getElementById('inputTanggal').value;
+
+    if (!nominalInput || nominalInput <= 0) return showToast('Masukkan nominal yang valid!', 'error');
+    if (!tanggalInput) return showToast('Pilih tanggal transaksi!', 'error');
+
+    const nominal = nominalInput * 1000;
+    const rek = state.rekeningAktif;
+
+    if (rek === 'pribadi') state.saldoPribadi += nominal;
+    else state.saldoCewe += nominal;
+
+    state.riwayat.push({
+      tipe: 'masuk',
+      jumlah: nominal,
+      tanggal: new Date(tanggalInput + 'T12:00:00').toISOString(),
+      rekening: rek
+    });
+
+    state.calDate = tanggalInput;
+
+    document.getElementById('inputNominal').value = '';
+    document.getElementById('nominalPreview').style.display = 'none';
+    saveData();
+    render();
+
+    const rekLabel = rek === 'pribadi' ? 'Pribadi' : 'Cewe';
+    showToast(`Nabung ${rekLabel} ${formatRupiah(nominal)} 💰`);
+
+    const target = getTargetAktif();
+    if (target > 0 && hitungTerkumpul(rek) >= target) {
+      setTimeout(() => showToast(`🎉 Target ${state.modeTarget} ${rekLabel} tercapai!`, 'success'), 800);
+    }
+  }
+
+  // ============ TARIK ============
+  function tarik() {
+    const nominalInput = parseFloat(document.getElementById('inputNominal').value);
+    const tanggalInput = document.getElementById('inputTanggal').value;
+
+    if (!nominalInput || nominalInput <= 0) return showToast('Masukkan nominal yang valid!', 'error');
+    if (!tanggalInput) return showToast('Pilih tanggal transaksi!', 'error');
+
+    const nominal = nominalInput * 1000;
+    const rek = state.rekeningAktif;
+    const saldoRek = rek === 'pribadi' ? state.saldoPribadi : state.saldoCewe;
+
+    if (nominal > saldoRek) {
+      const rekLabel = rek === 'pribadi' ? 'Pribadi' : 'Cewe';
+      return showToast(`Saldo ${rekLabel} tidak cukup!`, 'error');
+    }
+
+    if (rek === 'pribadi') state.saldoPribadi -= nominal;
+    else state.saldoCewe -= nominal;
+
+    state.riwayat.push({
+      tipe: 'keluar',
+      jumlah: nominal,
+      tanggal: new Date(tanggalInput + 'T12:00:00').toISOString(),
+      rekening: rek
+    });
+
+    state.calDate = tanggalInput;
+
+    document.getElementById('inputNominal').value = '';
+    document.getElementById('nominalPreview').style.display = 'none';
+    saveData();
+    render();
+
+    const rekLabel = rek === 'pribadi' ? 'Pribadi' : 'Cewe';
+    showToast(`Tarik ${rekLabel} ${formatRupiah(nominal)}`);
+  }
+
+  // ============ HAPUS ============
+  function hapusItem(idx) {
+    if (!confirm('Hapus transaksi ini?')) return;
+    const item = state.riwayat[idx];
+    if (item.rekening === 'pribadi') {
+      if (item.tipe === 'masuk') state.saldoPribadi -= item.jumlah;
+      else state.saldoPribadi += item.jumlah;
+    } else {
+      if (item.tipe === 'masuk') state.saldoCewe -= item.jumlah;
+      else state.saldoCewe += item.jumlah;
+    }
+    state.riwayat.splice(idx, 1);
+    saveData();
+    render();
+    showToast('Transaksi dihapus');
+  }
+
+  function hapusRiwayat() {
+    if (state.riwayat.length === 0) return showToast('Riwayat sudah kosong', 'error');
+    if (confirm('Hapus SEMUA riwayat? Semua saldo akan di-reset.')) {
+      state.riwayat = [];
+      state.saldoPribadi = 0;
+      state.saldoCewe = 0;
+      saveData();
+      render();
+      showToast('Semua riwayat dihapus');
+    }
+  }
+
+  // ============ ENTER KEY ============
+  document.getElementById('inputNominal').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') nabung();
+  });
+
+  // ============ INIT ============
+  loadData();
+  setDefaultTanggal();
+  render();
+</script>
+
+</body>
+</html>
